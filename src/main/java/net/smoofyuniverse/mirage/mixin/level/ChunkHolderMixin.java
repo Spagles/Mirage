@@ -208,19 +208,23 @@ public abstract class ChunkHolderMixin extends GenerationChunkHolder implements 
 	@Override
 	public void updateDynamism(int x, int y, int z, int distance) {
 		if (this.dynamismEnabled) {
-			getDynamicChunks().forEach(c -> c.update(x, y, z, distance));
+			for (ServerPlayer p : getPlayers(false)) {
+				DynamicChunk c = ((InternalPlayer) p).getDynamicChunk(this.pos.x, this.pos.z);
+				if (c != null)
+					c.update(x, y, z, distance);
+			}
 			markChanged();
 		}
-	}
-
-	private Stream<DynamicChunk> getDynamicChunks() {
-		return getPlayers(false).stream().map(p -> ((InternalPlayer) p).getDynamicChunk(this.pos.x, this.pos.z)).filter(Objects::nonNull);
 	}
 
 	@Override
 	public void clearDynamism() {
 		if (this.dynamismEnabled) {
-			getDynamicChunks().forEach(DynamicChunk::clear);
+			for (ServerPlayer p : getPlayers(false)) {
+				DynamicChunk c = ((InternalPlayer) p).getDynamicChunk(this.pos.x, this.pos.z);
+				if (c != null)
+					c.clear();
+			}
 			markChanged();
 		}
 	}
